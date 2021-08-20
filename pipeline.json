@@ -7,7 +7,7 @@
 "tag": "readdata"
         },
         {
-            "limits": "Classification![7:7]",
+            "limits": "Classification![2:2]",
             "type": "filters.range",
             "tag": "nonoise"
         },
@@ -31,13 +31,13 @@
             "tag": "classify"
         },
         {
-            "filename": "data/laz/iowa.laz",
+            "filename": "data/laz/iowa1.laz",
             "inputs": [ "classify" ],
             "tag": "writerslas",
             "type": "writers.las"
         },
         {
-            "filename": "data/tif/iowa.tif",
+            "filename": "data/tif/iowa1.tif",
             "gdalopts": "tiled=yes,     compress=deflate",
             "inputs": [ "writerslas" ],
             "nodata": -9999,

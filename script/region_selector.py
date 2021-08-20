@@ -27,8 +27,11 @@ def dataset_path(region:str):
         laz_path = name_list+'.laz'
         return full_dataset_path, tif_path, laz_path
     if type(name_list) == None:
-        return print("Region not found")
-
+        print(type(name_list))
+        full_dataset_path = f'https://s3-us-west-2.amazonaws.com/usgs-lidar-public/{name_list}/ept.json'
+        tif_path = f'{name_list}.tif'
+        laz_path = f'{name_list}.laz'
+        return full_dataset_path, tif_path, laz_path
     if type(name_list) == list:
         full_dataset_path_list = []
         tif_path_list = []

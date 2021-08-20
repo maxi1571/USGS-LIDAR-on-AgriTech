@@ -7,13 +7,12 @@ class FetchData():
     def __init__(self, bound, region:str):
         self.bound = bound
         self.region = region
-    
-
 
     def creat_pipeline(self):
         full_dataset_path, tif_path, laz_path = dataset_path(self.region)
         if type(full_dataset_path) == str:
             edited_json = edit_pipeline(full_dataset_path, laz_path, tif_path, self.bound)
+            print(edited_json)
             pipeline = pdal.Pipeline(json.dumps(edited_json))
             return pipeline
         else:

@@ -4,7 +4,7 @@ def SelectName(region:str):
     name_ls = []
     names_list =  io.open('./data/filename.txt', encoding='UTF-8').read().strip().split('\n')
     
-    if region in names_list and region == "IA_FullState":
+    if region in names_list or region == 'IA_FullState':
         print("I am a string region")
         return region
 

@@ -30,24 +30,22 @@ class FetchData():
             polygon_input += f'{x} {y}, '
         polygon_input = polygon_input[:-2]
         polygon_input += '))'
-        #print(polygon_input)
-        #print(f"({[minx, maxx]},{[miny,maxy]})")
+        print(polygon_input)
+        print(f"({[minx, maxx]},{[miny,maxy]})")
         return f"({[minx, maxx]},{[miny,maxy]})", polygon_input
 
 
     def creat_pipeline(self):
         bound, polygon_input = self.get_polygon_boundaries(self.polygon)
         full_dataset_path, tif_path, laz_path = dataset_path(self.region)
-        print(full_dataset_path)
         if type(full_dataset_path) == str:
             edited_json = edit_pipeline(full_dataset_path, laz_path, tif_path, self.output_epsg, bound, polygon_input)
-            print(edited_json)
             pipeline = pdal.Pipeline(json.dumps(edited_json))
             return pipeline
         else:
             pipeline_list = []
             for i in range(len(tif_path)):
-                edit_json = edit_pipeline(full_dataset_path[i], laz_path[i], tif_path[i], bound)
+                edit_json = edit_pipeline(full_dataset_path[i], laz_path[i], tif_path[i], self.output_epsg,bound, polygon_input)
                 pipelines = pdal.Pipeline(json.dumps(edit_json))
                 pipeline_list.append(pipelines)
             return pipeline_list
@@ -75,11 +73,10 @@ class FetchData():
             log = pipelines.log
 
 if(__name__ == '__main__'):
-    MINX, MINY, MAXX, MAXY = [-93.756155, 41.918015, -93.756055, 41.918115]
+    MINX, MINY, MAXX, MAXY = [-17.347, 80.653, -17.321, 80.911]
     polygon = Polygon(((MINX, MINY), (MINX, MAXY), (MAXX, MAXY), (MAXX, MINY), (MINX, MINY)))
-    region = "IA_FullState"
+    region = "AK_BrooksCamp_2012"
     data_fetcher = FetchData(polygon, region)
     pipeline_list = data_fetcher.creat_pipeline()
     print(pipeline_list)
     data_fetcher.run_pipeline()
-

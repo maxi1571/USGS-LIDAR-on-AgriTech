@@ -4,10 +4,9 @@ import geopandas as gpd
 from shapely.geometry import Polygon, Point
 from script.region_selector import dataset_path
 from script.edit_pipeline import edit_pipeline
-#from logger import Logger
 
-#logger = Logger()
-#logger = logger.get_logger('FetchData')
+# logger = Logger()
+# logger = logger.get_logger('FetchData')
 
 class FetchData():
     def __init__(self, polygon, region:str, input_epsg=3857, output_epsg=4326):
@@ -30,10 +29,23 @@ class FetchData():
             polygon_input += f'{x} {y}, '
         polygon_input = polygon_input[:-2]
         polygon_input += '))'
-        print(polygon_input)
-        print(f"({[minx, maxx]},{[miny,maxy]})")
+        # print(polygon_input)
+        # print(f"({[minx, maxx]},{[miny,maxy]})")
         return f"({[minx, maxx]},{[miny,maxy]})", polygon_input
+    
+    def get_elevation(self, array_data):
+        if array_data:
 
+            for i in array_data:
+                geometry_points = [Point(x, y) for x, y in zip(i["X"], i["Y"])]
+                elevations = i["Z"]
+                df = gpd.GeoDataFrame(columns=["elevation", "geometry"])
+                df['elevation'] = elevations
+                df['geometry'] = geometry_points
+                df = df.set_geometry("geometry")
+                df.set_crs(epsg=26915, inplace=True)
+
+            return df
 
     def creat_pipeline(self):
         bound, polygon_input = self.get_polygon_boundaries(self.polygon)
@@ -50,13 +62,12 @@ class FetchData():
                 pipeline_list.append(pipelines)
             return pipeline_list
 
-
-
     def run_pipeline(self):
         pipelines = self.creat_pipeline()
         if type(pipelines)==list:
             metadata_list = []
             log_list = []
+            pipeline_arrays = []
             for pipeline in pipelines:
                 try:
                     pipeline.execute()
@@ -64,19 +75,27 @@ class FetchData():
                     log = pipeline.log
                     metadata_list.append(metadata)
                     log_list.append(log)
+                    pipeline_arrays.append(pipeline.arrays)
+                
                 except RuntimeError as e:
                     print(e)
                     continue
+            return pipeline_arrays
         else:
+            
             pipelines.execute()
             metadata = pipelines.metadata
             log = pipelines.log
+            return pipelines.arrays
 
 if(__name__ == '__main__'):
-    MINX, MINY, MAXX, MAXY = [-17.347, 80.653, -17.321, 80.911]
+    MINX, MINY, MAXX, MAXY = [-93.756155, 41.918015, -93.756055, 42.918115]
     polygon = Polygon(((MINX, MINY), (MINX, MAXY), (MAXX, MAXY), (MAXX, MINY), (MINX, MINY)))
-    region = "AK_BrooksCamp_2012"
+    region = "IA_FullState"
     data_fetcher = FetchData(polygon, region)
     pipeline_list = data_fetcher.creat_pipeline()
-    print(pipeline_list)
-    data_fetcher.run_pipeline()
+    data=data_fetcher.run_pipeline()
+    print(type(data))
+    df = data_fetcher.get_elevation(data)
+    print(df.info())
+    print(df)

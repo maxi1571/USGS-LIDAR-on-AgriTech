@@ -41,7 +41,7 @@ class FetchData():
         print(full_dataset_path)
         if type(full_dataset_path) == str:
             edited_json = edit_pipeline(full_dataset_path, laz_path, tif_path, self.output_epsg, bound, polygon_input)
-            #print(edited_json)
+            print(edited_json)
             pipeline = pdal.Pipeline(json.dumps(edited_json))
             return pipeline
         else:
@@ -70,7 +70,6 @@ class FetchData():
                     print(e)
                     continue
         else:
-            print("I am here")
             pipelines.execute()
             metadata = pipelines.metadata
             log = pipelines.log
@@ -81,6 +80,6 @@ if(__name__ == '__main__'):
     region = "IA_FullState"
     data_fetcher = FetchData(polygon, region)
     pipeline_list = data_fetcher.creat_pipeline()
+    print(pipeline_list)
     data_fetcher.run_pipeline()
-
 
